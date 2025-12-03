@@ -1,6 +1,7 @@
+## About project
 <img src="nearest_stars_Standard.svg" alt="drawing" width="100%"/>
 
-This repository contains the code for reproducing classic results about the stellar kinematics.
+This repository contains the code for reproducing classic result from stellar kinematics.
 Code uses HYG star database (110K stars!) in order to obtain rectangular coordinates and velocity vectors.
 Also this repository is notable example of pretty mathematics and datascience.
 
@@ -9,9 +10,17 @@ Find HYG .csv dataset and place it in the same folder. Then run (details are in 
 ```
 python3 find_nearest_stars.py
 ```
+One can also use this code for any dataset with computed rectangular coordinates and velocities.
+In function 
+```
+def find(star_table, upper_bound=7.0):
+    ...
+```
+Units inside _star\_table_ pandas dataframe should be translated to _light years_ for coordinates and _light years per century_ for velocities.
+
 ## A bit of mathematics
 Lets choose rectangular coordinate system with center in the sun.
-Velocity vectors considered constant.
+Stellar velocity vectors are considered constant.
 
 Then distance to the sun from any star with position $(P,Q,R)$ and vector velocity $(A, B, C)$ 
 in our linear model is given by
