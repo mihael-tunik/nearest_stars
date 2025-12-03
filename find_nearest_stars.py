@@ -75,7 +75,8 @@ def find(star_table, upper_bound=7.0):
         t_min, d_min = hyperbola_minimum(star_pos, star_velocity)
 
         if d_min <= upper_bound:
-            print(f'{star_name} : d = {d_min} for t = {t_min/10} * 10^3 years')
+            t_thousands = t_min/10
+            print(f'{star_name} : d = {d_min:.2f} for t = {t_thousands:.1f} * 10^3 years')
 
             results.append({'star_name': star_name, 
                             'star_pos': star_pos,
@@ -88,7 +89,6 @@ def find(star_table, upper_bound=7.0):
 
 def draw_interval(stars, t_start, t_end, label='', lw=1.0, fs=5):
     fig, ax = plt.subplots()
-    #plt.figure(figsize=(30, 10))
 
     for d in stars:        
         times = range(10*t_start, 10*t_end)
@@ -105,8 +105,6 @@ def draw_interval(stars, t_start, t_end, label='', lw=1.0, fs=5):
     formatter = tkr.FuncFormatter(centuries_to_thousands)
     ax.xaxis.set_major_formatter(formatter)
 
-    #plt.title(f'Nearest stars')
-
     plt.xlabel("Time [thousands of years]")
     plt.ylabel("Distance to Sun [in light years]")
 
@@ -119,7 +117,6 @@ if __name__ == '__main__':
     df = pd.read_csv('hygdata_v41.csv')
     nearest_stars_table = prepare_data(df)
 
-    # experiments:
     stars = find(nearest_stars_table, 7.0) 
 
     draw_interval(stars, -2000, -20, 'Past', lw = 0.5, fs = 3)
