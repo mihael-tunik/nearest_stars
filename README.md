@@ -16,7 +16,7 @@ In function
 def find(star_table, upper_bound=7.0):
     ...
 ```
-Units inside _star\_table_ pandas dataframe should be translated to _light years_ for coordinates and _light years per century_ for velocities.
+units inside _star\_table_ pandas dataframe should be translated to _light years_ for coordinates and _light years per century_ for velocities.
 
 ## A bit of mathematics
 Lets choose rectangular coordinate system with center in the sun.
@@ -41,10 +41,10 @@ $$t = -\frac{A \cdot P + B \cdot Q + C \cdot R}{A^2 + B^2 + C^2}.$$
 
 Given star positions and velocities, let's use this expression for testing.
 
-> It is easy to check (also by "extracting the square") $$(P^2 + Q^2 + R^2) - \frac{(A \cdot P + B \cdot Q + C \cdot R)^2}{A^2 + B^2 + C^2} \geq 0$$ and verify it is exactly upper branch of hyperbola for $(P, Q, R) \neq (0, 0, 0)$ and $(A, B, C) \neq (0, 0, 0)$.
+> It is easy to prove (by Cauchy-Schwarz inequality) $$(P^2 + Q^2 + R^2) - \frac{(A \cdot P + B \cdot Q + C \cdot R)^2}{A^2 + B^2 + C^2} \geq 0$$ and verify that our formula for distance is always upper branch of hyperbola for $(P, Q, R) \neq (0, 0, 0)$ and $(A, B, C) \neq (0, 0, 0)$.
 
 ## Results
-My programm had found 29 stars with minimum less than 7 light years.
+For HYG star database program had found 29 stars with minimum achieved distances less than 7 light years.
 
 <img src="nearest_stars_Past.svg" alt="drawing" width="48%"/>
 <img src="nearest_stars_Long.svg" alt="drawing" width="48%"/>
