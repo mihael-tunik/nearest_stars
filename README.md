@@ -84,8 +84,8 @@ HIP_38965 : d = 1.87 for t = -1087.8 * 10^3 years
 <img src="nearest_stars_Past.svg" alt="drawing" width="48%"/>
 <img src="nearest_stars_Long.svg" alt="drawing" width="48%"/>
 
-Star Gl 710 will approach the sun as close as 1.21 ly in 1.437 million years.
-Star with HIP identifier 38965 had minimum distance 1.86 ly 1.087 million years ago.
+Star Gl 710 will approach the sun as close as 1.22 ly in 1.437 million years.
+Star with HIP identifier 38965 had minimum distance 1.87 ly 1.087 million years ago.
 
-Also program found a star GJ 2005 with achieved minimum distance 2.41 ly in 30 000 years from now.
+Also program found a star GJ 2005 with achieved minimum distance 2.42 ly in just 30 000 years from now.
 For compare current minimum distance is about 4 light years for Proxima Centauri.
