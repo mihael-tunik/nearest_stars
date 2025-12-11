@@ -1,32 +1,20 @@
 ## About project
-<img src="nearest_stars_Standard.svg" alt="drawing" width="100%"/>
+This repository contains the code for reproducing classic result from stellar kinematics: computed distances from the nearest stars to the solar system.
 
-This repository contains the code for reproducing classic result from stellar kinematics.
-Code uses HYG star database (110K stars!) in order to obtain rectangular coordinates and velocity vectors.
+<img src="nearest_stars_GCNS_test.svg" alt="drawing" width="100%"/>
+
+Code uses two main data sources with rectangular coordinates and stellar velocity vectors.
+- HYG star database (110K stars);
+- GCNS star database (330K stars);
+
+In this code, it is shown how some velocity vectors can be recovered from auxiliary data sources.
 Also this repository is notable example of pretty mathematics and datascience.
-
-## How to use
-Find HYG .csv dataset and place it in the same folder. Then run (details are in the code):
-```
-python3 find_nearest_stars.py
-```
-One can also use this code for any dataset with computed rectangular coordinates and velocities.
-In function 
-```
-def find(star_table, upper_bound=7.0):
-    ...
-```
-units inside _star\_table_ pandas dataframe should be translated to _light years_ for coordinates and _light years per century_ for velocities. As required minimum, it should contain columns: _'x', 'y', 'z', 'vx', 'vy', 'vz'_ for computations and _'proper'_ column with star names. Then use it as follows:
-```
-stars = find(stars_table, upper_bound) 
-draw_interval(stars, t_start, t_end, label, ...)
-```
 
 ## A bit of mathematics
 Lets choose rectangular coordinate system with center in the sun.
 Stellar velocity vectors are considered constant.
 
-Then distance to the sun from any star with position $(P,Q,R)$ and vector velocity $(A, B, C)$ 
+Then distance to the sun from any star with position $(P, Q, R)$ and vector velocity $(A, B, C)$ 
 in our linear model is given by
 
 $$d = \sqrt{(P+A \cdot t)^2 + (Q+B \cdot t)^2 + (R+C \cdot t)^2}.$$
@@ -43,49 +31,73 @@ by "extracting the square" trick.
 Last formula means that $d$ is minimized when 
 $$t = -\frac{A \cdot P + B \cdot Q + C \cdot R}{A^2 + B^2 + C^2}.$$
 
-Given star positions and velocities, let's use this expression for testing.
+Given star *positions* and *velocities*, let's use this expression for testing.
 
-> It is easy to prove (by Cauchy-Schwarz inequality) $$(P^2 + Q^2 + R^2) - \frac{(A \cdot P + B \cdot Q + C \cdot R)^2}{A^2 + B^2 + C^2} \geq 0$$ and verify that our formula for distance is always upper branch of hyperbola for $(P, Q, R) \neq (0, 0, 0)$ and $(A, B, C) \neq (0, 0, 0)$ in general case when sun does not meet with other star on trajectory.
+> It is easy to prove (by Cauchy-Schwarz inequality) that $(P^2 + Q^2 + R^2) - \frac{(A \cdot P + B \cdot Q + C \cdot R)^2}{A^2 + B^2 + C^2}$ is non-negative and verify that our formula for distance is always upper branch of hyperbola for non-zero velocity in general case when sun does not meet with other star on trajectory.
 
-## Results
-For HYG star database program had found 29 stars with minimum achieved distances less than 7 light years:
+## Example
+Find HYG .csv dataset and place it in the same folder. 
+```python
+if __name__ == '__main__':
+    HYG_experiment('./HYG.csv')
+    # GCNS_experiment_with_patch('./GCNS.csv')
 ```
-Proxima Centauri : d = 3.50 for t = 24.8 * 10^3 years
-Toliman : d = 2.87 for t = 27.6 * 10^3 years
-Barnard's Star : d = 3.66 for t = 10.0 * 10^3 years
-Lalande 21185 : d = 4.71 for t = 20.0 * 10^3 years
-Gl 65B : d = 6.80 for t = -29.7 * 10^3 years
-Ross 154 : d = 5.93 for t = 149.9 * 10^3 years
-Ross 248 : d = 3.07 for t = 36.3 * 10^3 years
-Ran : d = 6.94 for t = -104.8 * 10^3 years
-Ross 128 : d = 6.25 for t = 71.0 * 10^3 years
-Kapteyn's Star : d = 6.99 for t = -10.9 * 10^3 years
-Kruger 60 : d = 6.41 for t = 89.2 * 10^3 years
-Gl 860B : d = 6.41 for t = 93.8 * 10^3 years
-Gl 445 : d = 3.42 for t = 44.8 * 10^3 years
-Gl 783A : d = 6.65 for t = 40.1 * 10^3 years
-GJ 2097 : d = 6.86 for t = 798.9 * 10^3 years
-GJ 2005 : d = 2.42 for t = 33.1 * 10^3 years
-Gl 358 : d = 6.08 for t = -62.7 * 10^3 years
-Gl 208 : d = 5.26 for t = -507.7 * 10^3 years
-GJ 3106 : d = 3.76 for t = 1806.1 * 10^3 years
-Gl 620.1B : d = 3.87 for t = -245.4 * 10^3 years
-Wasat : d = 6.98 for t = 1169.2 * 10^3 years
-Gl 710 : d = 1.22 for t = 1437.7 * 10^3 years
-Gl 217.1 : d = 6.58 for t = -1284.9 * 10^3 years
-HIP_38228 : d = 5.99 for t = 1142.3 * 10^3 years
-HIP_30067 : d = 6.18 for t = -626.2 * 10^3 years
-HIP_21158 : d = 3.21 for t = -1891.1 * 10^3 years
-HIP_26624 : d = 5.58 for t = -1889.2 * 10^3 years
-HIP_25240 : d = 6.09 for t = -1209.2 * 10^3 years
-HIP_38965 : d = 1.87 for t = -1087.8 * 10^3 years
+Then run (details are in the code):
 ```
+python3 run_experiment.py
+```
+One can also use this code for any dataset with computed rectangular coordinates and velocities.
 
-<img src="nearest_stars_Past.svg" alt="drawing" width="48%"/>
-<img src="nearest_stars_Long.svg" alt="drawing" width="48%"/>
+## How to use in code
+In function 
+```python
+def find(star_table, upper_bound=7.0):
+    ...
+```
+input pandas dataframe should have columns: _'x', 'y', 'z', 'vx', 'vy', 'vz'_ for computations and _'proper'_ column with star names.
+And units inside _star\_table_ dataframe should be translated to _light years_ for coordinates and _light years per century_ for velocities
 
-Star Gl 710 will approach the sun as close as 1.22 ly in 1.437 million years.
-Star with HIP identifier 38965 had minimum distance 1.87 ly 1.087 million years ago.
+Use it in your code as follows:
+```python
+stars = find(stars_table, upper_bound) 
+draw_interval(stars, t_start, t_end, label, ...) # time should be in thousands of years
+```
+This will print stars with $t_{min}, d_{min}$ and draw a picture with distances.
 
-Also program found a star GJ 2005 with achieved minimum distance 2.42 ly in just 30 000 years from now.
+## How to restore velocity vectors
+Unfortunately, 75% of GCNS data do not have vector velocity (including Barnard's star!).
+
+If $(\alpha, \delta, \pi)$ data was given and proper motions $\mu_{\delta}, \mu_{\alpha^*}$ with radial velocity $v_r$ was measured, then velocity vector in Galactic coordinate system can be computed as follows:
+```python
+def get_uvw(star_info):
+    alpha = star_info['RAdeg'] * (np.pi / 180)
+    delta, omega = star_info['DEdeg'] * (np.pi / 180), star_info['Plx']
+    mu_a, mu_d, vr  = star_info['pmRA'], star_info['pmDE'], star_info['RV']
+    
+    v = [speed_to_kms * mu_a / omega, speed_to_kms * mu_d / omega, vr ]
+    A_G_t = np.array(N_B) @ np.array(X_0)
+    A = [[-np.sin(alpha), -np.sin(delta)*np.cos(alpha)  , np.cos(delta)*np.cos(alpha) ],
+         [np.cos(alpha) , -np.sin(delta)*np.sin(alpha)  , np.cos(delta)*np.sin(alpha) ],
+         [0             ,  np.cos(delta)                , np.sin(delta)               ]]
+    return A_G_t @ np.array(A) @ np.array(v)
+```
+The main problem is RV is often missed together with vector velocity.
+That means dataset should be patched with RV values in order to get more stars for our experiment.
+
+In experiment, _sosdr1.csv_ data from "Survey of surveys I" (11 541 195 stars) and _'rvstdcat.csv'_ dataset (4 813 stars) with averaged $v_r$ from "Gaia DR2 radial velocity standard stars catalog" was used.
+
+## Results (HYG data)
+For HYG star database program had found 12 stars with minimum achieved distances less than 5 light years.
+
+<img src="nearest_stars_HYG_test.svg" alt="drawing" width="100%"/>
+
+As an interesting fact, program found a star GJ 2005 with achieved minimum distance 2.42 ly in just 30 000 years from now.
 For compare current minimum distance is about 4 light years for Proxima Centauri.
+
+## Results (GCNS data)
+Results for GCNS data are expected to be more precize. 
+Difference can be seen, for example, by estimates for famous Gl 710 star.
+HYG data usage lead to minimal distance estimate equal to 1.22 ly in 1.437 million years. 
+However, GCNS data leads to estimate 0.17 ly for in 1.282 million years.
+
+For augmented version of GCNS dataset this program had found 44 stars with minimum achieved distances less than 5 light years.
