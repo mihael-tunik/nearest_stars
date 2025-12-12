@@ -83,13 +83,13 @@ def GCNS_experiment_with_patch(path_to_GCNS, patch=True):
 
     df_new = pd.DataFrame({
                            'proper' : star_names,
-                           'dist': light_years_per_parsec * 1000 * np.array(list(df_gcns['Dist50'])),
-                           'x': light_years_per_parsec * np.array(list(df_gcns['xcoord50'])),
-                           'y': light_years_per_parsec * np.array(list(df_gcns['ycoord50'])),
-                           'z': light_years_per_parsec * np.array(list(df_gcns['zcoord50'])),
-                           'vx': kms_to_lyc * (np.array(list(df_gcns['Uvel50'])) ),
-                           'vy': kms_to_lyc * (np.array(list(df_gcns['Vvel50'])) ),
-                           'vz': kms_to_lyc * (np.array(list(df_gcns['Wvel50'])) )
+                           'dist': light_years_per_parsec * 1000 * df_gcns['Dist50'].to_numpy(),
+                           'x': light_years_per_parsec * df_gcns['xcoord50'].to_numpy(),
+                           'y': light_years_per_parsec * df_gcns['ycoord50'].to_numpy(),
+                           'z': light_years_per_parsec * df_gcns['zcoord50'].to_numpy(),
+                           'vx': kms_to_lyc * df_gcns['Uvel50'].to_numpy(),
+                           'vy': kms_to_lyc * df_gcns['Vvel50'].to_numpy(),
+                           'vz': kms_to_lyc * df_gcns['Wvel50'].to_numpy()
                           })
     
     stars = find(df_new, 5.0)

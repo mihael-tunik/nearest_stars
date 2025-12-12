@@ -17,8 +17,10 @@ Gaia_EDR3_ID_to_common = {
                          }
 
 light_years_per_parsec = 3.2615637769
-kms_to_lyc = 0.000333564095198152
-speed_to_kms = 4.74047 # milliarcseconds / year to km / s
+kms_to_lyc     = 0.000333564095198152
+AU_to_km       = 149597870.7
+year_to_s      = 31557600
+speed_to_kms   = AU_to_km / year_to_s # = 4.74047 milliarcseconds / year to km / s
 
 # from article 'Reconsidering the Galactic coordinate system'
 N_B = [[-0.066988739410, -0.872755765850, -0.483538914637],
