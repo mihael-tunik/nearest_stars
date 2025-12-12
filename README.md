@@ -4,11 +4,11 @@ This repository contains the code for reproducing classic result from stellar ki
 <img src="nearest_stars_GCNS_test.svg" alt="drawing" width="100%"/>
 
 Code uses two main data sources with rectangular coordinates and stellar velocity vectors.
-- HYG star database (110K stars);
-- GCNS star database (330K stars);
+- HYG star database (110K stars), contains data from Hipparcos, Yale Bright Star and Gliese catalogues, includes distant stars >1000 light years away;
+- GCNS star database (330K stars), contains stars within 100 parsec radius from the solar system;
 
-In this code, it is shown how some velocity vectors can be recovered from auxiliary data sources.
-Also this repository is notable example of pretty mathematics and datascience.
+Surprisingly, GCNS star database do not contain some nearby stars which is not as good for purposes of this project.
+In this code, it is shown how some velocity vectors can be recovered from auxiliary data sources for GCNS.
 
 ## A bit of mathematics
 Lets choose rectangular coordinate system with center in the sun.
@@ -51,7 +51,7 @@ One can also use this code for any dataset with computed rectangular coordinates
 ## How to use in code
 In function 
 ```python
-def find(star_table, upper_bound=7.0):
+def find(star_table, upper_bound=5.0):
     ...
 ```
 input pandas dataframe should have columns: _'x', 'y', 'z', 'vx', 'vy', 'vz'_ for computations and _'proper'_ column with star names.
@@ -65,7 +65,8 @@ draw_interval(stars, t_start, t_end, label, ...) # time should be in thousands o
 This will print stars with $t_{min}, d_{min}$ and draw a picture with distances.
 
 ## How to restore velocity vectors
-Unfortunately, 75% of GCNS data do not have vector velocity (including Barnard's star!).
+Unfortunately, 75% of stars in GCNS data do not have vector velocity (including Barnard's star, one of the nearest to our solar system).
+However, the data contains columns with measured right ascention, declination, proper motions and more. 
 
 If $(\alpha, \delta, \pi)$ data was given and proper motions $\mu_{\delta}, \mu_{\alpha^*}$ with radial velocity $v_r$ was measured, then velocity vector in Galactic coordinate system can be computed as follows:
 ```python
@@ -92,7 +93,7 @@ For HYG star database program had found 12 stars with minimum achieved distances
 <img src="nearest_stars_HYG_test.svg" alt="drawing" width="100%"/>
 
 As an interesting fact, program found a star GJ 2005 with achieved minimum distance 2.42 ly in just 30 000 years from now.
-For compare current minimum distance is about 4 light years for Proxima Centauri.
+For comparison current minimum distance is about 4.25 light years for Proxima Centauri.
 
 ## Results (GCNS data)
 Results for GCNS data are expected to be more precize. 
