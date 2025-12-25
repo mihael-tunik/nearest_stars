@@ -24,7 +24,8 @@ def hyperbola_minimum(star_pos, star_velocity):
     return t_min, d_min
 
 def get_name(star_info):
-    star_name = star_info['proper'] 
+    star_name = star_info['proper']
+    # TODO?
     if star_name is np.nan:
         star_name = star_info['gl']
     if star_name is np.nan:
@@ -34,27 +35,50 @@ def get_name(star_info):
             pass            
     return star_name
 
-def centuries_to_thousands(x, pos):
-    return f'{x / 10:.0f}'
+def find(star_table, central_star_name='Sun', upper_bound=5.0):
+    print(f'Stars with minimum achieved distance <= {upper_bound} light years to {central_star_name}:\n')
+    results, t = [], star_table.loc[star_table['proper'] == central_star_name]
 
-def find(star_table, upper_bound=5.0):
-    results = []
-    print(f'Stars with minimum achieved distance <= {upper_bound} light years:\n')
+    px, py, pz = list(t['x'])[0], list(t['y'])[0], list(t['z'])[0]
+    vx, vy, vz = list(t['vx'])[0], list(t['vy'])[0], list(t['vz'])[0]
+    
+    star_table['x'] = star_table['x'] - px
+    star_table['y'] = star_table['y'] - py
+    star_table['z'] = star_table['z'] - pz
+    
+    star_table['vx'] = star_table['vx'] - vx
+    star_table['vy'] = star_table['vy'] - vy
+    star_table['vz'] = star_table['vz'] - vz
+
+    star_table['dot_product'] = pd.eval("star_table.x*star_table.vx + star_table.y*star_table.vy + star_table.z*star_table.vz")   
+    star_table['v_norm']      = pd.eval("star_table.vx**2 + star_table.vy**2 + star_table.vz**2") 
+    star_table['t_min']       = pd.eval("-star_table.dot_product / star_table.v_norm")
+    star_table['d_min']       = pd.eval("(star_table.x**2 + star_table.y**2 + star_table.z**2 - star_table.dot_product**2 / star_table.v_norm)**0.5")
+    
+    star_table.dropna()
+    star_table = star_table[star_table['d_min'] <= upper_bound]
+
+    print(f'filtered star_table length: {len(star_table)}')
+    print(star_table)
 
     for num, row in star_table.iterrows():
         star_info = row.to_dict()
-        star_name, star_pos = get_name(star_info), [star_info['x'], star_info['y'], star_info['z']]
+
+        if star_info['proper'] == central_star_name:
+            continue
+
+        star_name = get_name(star_info)
+        
+        star_pos      = [star_info['x'], star_info['y'], star_info['z']]
         star_velocity = [star_info['vx'], star_info['vy'], star_info['vz']]
         
-        t_min, d_min = hyperbola_minimum(star_pos, star_velocity)
+        #t_min, d_min = hyperbola_minimum(star_pos, star_velocity)
+        results.append({'star_name': star_name, 'star_pos': star_pos,
+                            'star_velocity': star_velocity, 't_min': star_info['t_min'], 'd_min': star_info['d_min']})
+        d_min, t_thousands = star_info['d_min'], star_info['t_min'] / 10
+        print(f'{star_name} : d = {d_min:.2f} for t = {t_thousands:.1f} * 10^3 years')
 
-        if d_min <= upper_bound:
-            t_thousands = t_min / 10
-            print(f'{star_name} : d = {d_min:.2f} for t = {t_thousands:.1f} * 10^3 years')
-            results.append({'star_name': star_name, 'star_pos': star_pos,
-                            'star_velocity': star_velocity, 't_min': t_min, 'd_min': d_min})
-    
-    print(f'\n{len(results)} stars in total.')
+    print(f'\n{len(results)} stars in total.')    
     return results
 
 def text_overlap(text_pos, pt):
@@ -63,13 +87,14 @@ def text_overlap(text_pos, pt):
             return True
     return False
 
-def draw_interval(stars, t_start, t_end, label='', lw=1.0, fs=5, max_dist=8.0):
+def draw_interval(stars, t_start, t_end, central_star_name='Sun', label='', lw=1.0, fs=5, max_dist=8.0):
     fig, ax = plt.subplots()
-    text_pos = []
+    plt.suptitle(f'Nearest stars for {central_star_name}')
+
+    text_pos, tx, ty = [], -10, -0.15
     
     for i, d in enumerate(stars):        
         times, distances = range(10*t_start, 10*t_end), []
-        tx, ty = -10, -0.15
         for t in times: # time in centuries for better resolution
             distances.append(dist([0, 0, 0], get_coord(d['star_pos'], d['star_velocity'], t)))
         distances, plot_visible = np.array(distances), False
@@ -85,9 +110,9 @@ def draw_interval(stars, t_start, t_end, label='', lw=1.0, fs=5, max_dist=8.0):
             plt.text(ttx, tty, d['star_name'], fontsize=fs, color='#1f1f1f', zorder=2*(i+len(stars)+1)+3)
             text_pos.append((ttx, tty))
 
-    ax.xaxis.set_major_formatter(tkr.FuncFormatter(centuries_to_thousands))
-    plt.xlabel("Time [thousands of years]")
-    plt.ylabel("Distance to Sun [in light years]")
-    plt.ylim([0, 8])
+    ax.xaxis.set_major_formatter(tkr.FuncFormatter(lambda x, pos: f'{x / 10:.0f}'))
+    plt.xlabel('Time [thousands of years]')
+    plt.ylabel(f'Distance to star [in light years]')
+    plt.ylim([0, max_dist])
     plt.grid(True, zorder=0)
     plt.savefig(f'nearest_stars_{label}.svg', bbox_inches='tight')

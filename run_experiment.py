@@ -1,7 +1,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tkr
 import numpy as np
-import pandas as pd 
+import pandas as pd
+import polars as pl
+import re
+
 from find_nearest_stars import find, draw_interval
 from mini_star_lib import get_uvw, light_years_per_parsec, kms_to_lyc, Gaia_EDR3_ID_to_common
 
@@ -17,8 +20,11 @@ def prepare_HYG_data(df):
 def HYG_experiment(path_to_HYG):
     df = pd.read_csv(path_to_HYG)
     nearest_stars_table = prepare_HYG_data(df)
-    stars = find(nearest_stars_table, 5.0) 
-    draw_interval(stars, -20, 100, 'HYG_test', lw = 1.0, fs = 3)
+    nearest_stars_table.loc[len(nearest_stars_table)] = { 'proper' : 'Sun', 'dist': 0, 
+                                                          'x' : 0,  'y': 0,  'z': 0, 
+                                                          'vx': 0, 'vy': 0, 'vz': 0  }
+    stars = find(nearest_stars_table, central_star_name = 'Sun', upper_bound=5.0)
+    draw_interval(stars, -20, 100, central_star_name = 'Sun', label='HYG_test', lw = 1.0, fs = 3)
 
 def GCNS_experiment_with_patch(path_to_GCNS, patch=True):
     column_names = ['GaiaEDR3','RAdeg','e_RAdeg','DEdeg','e_DEdeg',
@@ -74,6 +80,8 @@ def GCNS_experiment_with_patch(path_to_GCNS, patch=True):
             
             if star in Gaia_EDR3_ID_to_common:
                 star = Gaia_EDR3_ID_to_common[star]
+                print('Find in database: ', star)
+
             if np.isnan(star_info['Uvel50']) and not np.isnan(star_info['RV']): # fix by restored RV
                 V = get_uvw(star_info)
                 df_gcns.iloc[index, df_gcns.columns.get_loc('Uvel50')] = V[0]
@@ -81,7 +89,7 @@ def GCNS_experiment_with_patch(path_to_GCNS, patch=True):
                 df_gcns.iloc[index, df_gcns.columns.get_loc('Wvel50')] = V[2]
             star_names.append(star)
 
-    df_new = pd.DataFrame({
+    nearest_stars_table = pd.DataFrame({
                            'proper' : star_names,
                            'dist': light_years_per_parsec * 1000 * df_gcns['Dist50'].to_numpy(),
                            'x': light_years_per_parsec * df_gcns['xcoord50'].to_numpy(),
@@ -92,9 +100,49 @@ def GCNS_experiment_with_patch(path_to_GCNS, patch=True):
                            'vz': kms_to_lyc * df_gcns['Wvel50'].to_numpy()
                           })
     
-    stars = find(df_new, 5.0)
-    draw_interval(stars, -20, 100, 'GCNS_test', lw = 1.0, fs = 3)
+    nearest_stars_table.loc[len(nearest_stars_table)] = { 'proper' : 'Sun', 'dist': 0, 
+                                                          'x' : 0,  'y': 0,  'z': 0, 
+                                                          'vx': 0, 'vy': 0, 'vz': 0  }
+
+    stars = find(nearest_stars_table, central_star_name = 'Sun', upper_bound=5.0)
+    draw_interval(stars, -20, 100, central_star_name = 'Sun', label='GCNS_test', lw = 1.0, fs = 3)
+
+def GAIA_DR3_experiment_with_patch(path_to_GAIA, central_star_name='Sun'):
+    #df = pd.read_csv(path_to_GAIA, engine='pyarrow')
+    df = pl.read_csv(path_to_GAIA).to_pandas()     
+
+    nearest_stars_table = pd.DataFrame({
+                           'proper' : df['GaiaDR3_id'],
+                           'dist': light_years_per_parsec * df['r_eqt'],
+                           'x': light_years_per_parsec * df['x_gal'],
+                           'y': light_years_per_parsec * df['y_gal'],
+                           'z': light_years_per_parsec * df['z_gal'],
+                           'vx': kms_to_lyc * df['vx_gal'],
+                           'vy': kms_to_lyc * df['vy_gal'],
+                           'vz': kms_to_lyc * df['vz_gal']
+                          })
+
+    del df
+    
+    nearest_stars_table.loc[len(nearest_stars_table)] = {'proper' : 'Sun', 'dist': 0, 
+                                                         'x': 0,  'y': 0,  'z': 0, 
+                                                        'vx': 0, 'vy': 0, 'vz': 0  }
+
+    for star_id, star_name in Gaia_EDR3_ID_to_common.items():
+        nearest_stars_table.loc[nearest_stars_table['proper'] == star_id, 'proper'] = star_name
+
+    print('ready to search stars...')
+    
+    star_label = re.sub(r'[\W_]+', '_', central_star_name) if central_star_name != 'Sun' else 'test'
+
+    stars = find(nearest_stars_table, central_star_name = central_star_name, upper_bound = 5.0) 
+    draw_interval(stars, -20, 100, central_star_name = central_star_name, label = f'GAIA_DR3_{star_label}', lw = 1.0, fs = 3)
 
 if __name__ == '__main__':
     HYG_experiment('./HYG.csv')
     GCNS_experiment_with_patch('./GCNS.csv')
+    GAIA_DR3_experiment_with_patch('./Gaia_rv_dr3_patched_with_GCNS.csv', central_star_name='Sun')
+    GAIA_DR3_experiment_with_patch('./Gaia_rv_dr3_patched_with_GCNS.csv', central_star_name='Alpha Centauri A/B')
+    GAIA_DR3_experiment_with_patch('./Gaia_rv_dr3_patched_with_GCNS.csv', central_star_name='Gliese 445')
+    GAIA_DR3_experiment_with_patch('./Gaia_rv_dr3_patched_with_GCNS.csv', central_star_name='Wolf 359')
+    GAIA_DR3_experiment_with_patch('./Gaia_rv_dr3_patched_with_GCNS.csv', central_star_name='Ross 248')
