@@ -34,15 +34,15 @@ $$t_{min} = -\frac{A \cdot P + B \cdot Q + C \cdot R}{A^2 + B^2 + C^2}.$$
 ### General solution
 Let's rewrite similar logic using vectors in general case for pair of stars with positions $\bar{p}_t, \bar{q}_t$ 
 and velocities $\bar{v}_p, \bar{v}_q$:
-$$ d^2 = ||\bar{p}_t - \bar{q}_t||^2,$$
+$$ d^2 = \|\bar{p}_t - \bar{q}_t\|^2,$$
 where $\bar{p}_t = \bar{p}_0 + \bar{v}_p \cdot t$ and $\bar{q}_t = \bar{q}_0 + \bar{v}_q \cdot t$.
 Then it is easy to rewrite expression for $d^2$ in terms of relative position and speed: 
-$$ d^2 = ||(\bar{p}_0 - \bar{q}_0) + (\bar{v}_p - \bar{v}_q) \cdot t||^2 = ||\bar{p}_{rel} + \bar{v}_{rel} \cdot t||^2.$$
+$$ d^2 = \|(\bar{p}_0 - \bar{q}_0) + (\bar{v}_p - \bar{v}_q) \cdot t\|^2 = \|\bar{p}_{rel} + \bar{v}_{rel} \cdot t\|^2.$$
 
 This expression reminds the case from previous paragraph. 
 The derivative
-$$(||\bar{p}_{rel} + \bar{v}_{rel} \cdot t||^2)' = 2 \cdot (||\bar{v}_{rel} ||^2 \cdot t + \langle \bar{p}_{rel}, \bar{v}_{rel} \rangle) $$
-is equal zero when $$t = -\frac{\langle \bar{p}_{rel}, \bar{v}_{rel} \rangle}{||\bar{v}_{rel} ||^2}$$
+$$(\|\bar{p}_{rel} + \bar{v}_{rel} \cdot t\|^2)' = 2 \cdot (\|\bar{v}_{rel} \|^2 \cdot t + \langle \bar{p}_{rel}, \bar{v}_{rel} \rangle) $$
+is equal zero when $$t = -\frac{\langle \bar{p}_{rel}, \bar{v}_{rel} \rangle}{\|\bar{v}_{rel}\|^2}$$
 and that perfectly coincides with initial proof.
 
 Given star *positions* and *velocities*, let's use this expression for testing.
